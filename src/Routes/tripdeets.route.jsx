@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 // import Infocard from "../Components/Infocard.component";
 
-export default function Tripdeets({ routingResults, fromLocation, toLocation, latitude, longitude, apikey }) {
+export default function Tripdeets({ routingResults, fromLocation, searchArea, toLocation, latitude, longitude, apikey, vialocation, setVialocation }) {
 
   const newRef = useRef(null);
 
@@ -31,11 +31,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
         setShowToSuggestions(true)
       })
     }
-  }, [waypointsearch, latitude, toSuggestions, setToSuggestions])
-
-  function addmore() {
-    setAddwaypoint(!addwaypoint);
-  }
+  }, [toLocation, waypointsearch, latitude])
 
   let metric;
   let tmetric;
@@ -63,7 +59,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
       return `${timeInMinutes}`;
     }
   }
-  console.log(routingResults)
 
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
@@ -74,6 +69,16 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
         <span className="material-symbols-outlined text-blue-700 items-center">
           arrow_downward
         </span>
+        {console.log(vialocation)}
+        {vialocation && vialocation.position?.lat !== undefined && (
+          <>
+            <div className="inline-block">
+              <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{vialocation.title}</h2>
+            </div>
+            <span className="material-symbols-outlined text-blue-700 items-center">
+              arrow_downward
+            </span></>
+        )}
         <div className="inline-block">
           <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{toLocation.title}</h2>
         </div>      </div>
@@ -91,9 +96,12 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
           <p className="text-blue-800">INR</p>
         </div>
       </div>
-      {!addwaypoint && (<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={addmore}>
-        + Multitrip
-      </button>)}
+      {console.log(waypointsearch)}
+      {vialocation && vialocation.title === "" && (
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={() => setAddwaypoint(!addwaypoint)}>
+          + Add a via point
+        </button>
+      )}
       {addwaypoint && (
         <>
           <div className="flex gap-3">
@@ -104,8 +112,8 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
                 }
               })
             }} />
-            <button onClick={() => setAddwaypoint(false)}><span className="material-symbols-outlined">
-              close
+            <button onClick={searchArea}><span className="material-symbols-outlined bg-white p-2 rounded-full">
+              search
             </span></button>
             {
               showToSuggestions &&
@@ -114,7 +122,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
                   toSuggestions.items &&
                   toSuggestions?.items.map((suggestion) => {
                     return (
-                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { setAddwaypoint(suggestion); setShowToSuggestions(false); }}>
+                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { console.log("hello"); setWaypointsearch(suggestion); setAddwaypoint(suggestion); setShowToSuggestions(false); setVialocation(suggestion) }}>
                         {suggestion.title}
                       </div>
                     )
@@ -123,14 +131,9 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
               </div>
             }
           </div>
-
-
-
-          )
-
-
-
         </>)}
+
+      {console.log(showToSuggestions)}
 
       <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
@@ -138,7 +141,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
             <p className="font-semibold"> Routing Instructions </p>
             <span
               className="material-symbols-outlined"
-
             >
               {droproute ? "expand_less" : "expand_more"}
             </span>

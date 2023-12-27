@@ -13,7 +13,7 @@ export default function MapElement({ latitude, longitude }) {
   const FromRef = useRef(null);
   const toRef = useRef(null);
 
-  const apikey = "xliEh-9IGlgHooBU3blPve9WjixVfEPNQdtvcTuVpCo";
+  const apikey = "E1RQs4gDilxM4-hVVPH4tfHM8KUSpVvTTJXPbrnaX98";
 
   const router = platform.current?.getRoutingService(null, 8);
   var destination = { lat: latitude, lng: longitude };
@@ -22,6 +22,7 @@ export default function MapElement({ latitude, longitude }) {
   // const [fromLocation, setFromLocation] = useState(fromLocationAPI);
   const [toLocation, setToLocation] = useState({ title: "" });
   // const [toLocation, setToLocation] = useState(toLocationAPI);
+  const [vialocation, setVialocation] = useState({ title: "" })
 
 
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
@@ -111,9 +112,6 @@ export default function MapElement({ latitude, longitude }) {
         const behavior = new H.mapevents.Behavior(
           new H.mapevents.MapEvents(newMap)
         );
-
-
-
         map.current = newMap;
       }
     },
@@ -141,8 +139,21 @@ export default function MapElement({ latitude, longitude }) {
 
       const endMarker = new H.map.Marker(destination);
 
+      let viaMarker;
+
+      console.log(vialocation)
+
+      if (vialocation && vialocation.position) {
+        viaMarker = new H.map.Marker({ lat: vialocation.position.lat, lng: vialocation.position.lng });
+      }
+
       routingGroup.current = new H.map.Group();
+      console.log(routeLine, startMarker, endMarker)
       routingGroup.current.addObjects([routeLine, startMarker, endMarker]);
+
+      if (vialocation && vialocation.title !== "") {
+        routingGroup.current.addObject(viaMarker);
+      }
 
       map.current.addObject(routingGroup.current);
 
@@ -157,11 +168,14 @@ export default function MapElement({ latitude, longitude }) {
   };
 
   function clearRoute() {
+    // if (vialocation.position === undefined) {
+    //   setRoutingEnabled(false);
+    // }
     map.current.removeObject(routingGroup.current);
-    setRoutingEnabled(false);
   }
 
-  function searchRoute() {
+
+  function searchRoute(points = false) {
     if (routingEnabled) {
       clearRoute();
     }
@@ -172,6 +186,11 @@ export default function MapElement({ latitude, longitude }) {
       'destination': `${toLocation.position.lat},${toLocation.position.lng}`,
       'return': 'polyline,summary,typicalDuration,turnbyturnactions',
     };
+
+    if (vialocation?.position !== undefined) {
+      routingParameters['via'] = new H.service.Url.MultiValueQueryParameter([`${vialocation.position.lat},${vialocation.position.lng}`]);
+    }
+
     destination = { lat: toLocation.position.lat, lng: toLocation.position.lng }
     router.calculateRoute(routingParameters, onResult,
       function (error) {
@@ -188,6 +207,12 @@ export default function MapElement({ latitude, longitude }) {
       zoom: 17
     })
   }
+
+  // useEffect(() => {
+  //   if (vialocation && vialocation.position) {
+  //     searchRoute(true);
+  //   }
+  // }, [vialocation])
 
   return (
     <>
@@ -244,6 +269,9 @@ export default function MapElement({ latitude, longitude }) {
           <div className="flex bg-white p-2 text-blue-300 rounded-full cursor-pointer" onClick={() => {
             if (routingEnabled) {
               clearRoute();
+              if (vialocation) {
+                setVialocation({ title: "" });
+              }
             } else {
               searchRoute();
             }
@@ -254,7 +282,7 @@ export default function MapElement({ latitude, longitude }) {
       </div>
       {
         routingEnabled &&
-        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} />
+        <Tripdeets searchArea={searchRoute} fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} vialocation={vialocation} setVialocation={setVialocation} />
       }
       <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
         <div className="flex">
