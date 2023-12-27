@@ -13,7 +13,7 @@ export default function MapElement({ latitude, longitude }) {
   const FromRef = useRef(null);
   const toRef = useRef(null);
 
-  const apikey = "cMxmIwLWuTOB_iK-v0kyWEcrJX2jAlLh3O2a73cENcU";
+  const apikey = "xliEh-9IGlgHooBU3blPve9WjixVfEPNQdtvcTuVpCo";
 
   const router = platform.current?.getRoutingService(null, 8);
   var destination = { lat: latitude, lng: longitude };
@@ -254,7 +254,7 @@ export default function MapElement({ latitude, longitude }) {
       </div>
       {
         routingEnabled &&
-        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} />
+        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} />
       }
       <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
         <div className="flex">
