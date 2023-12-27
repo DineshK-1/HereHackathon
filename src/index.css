@@ -88,3 +88,16 @@ input{
   border-radius: 10px;
   font-size: small;
 }
+
+*::-webkit-scrollbar {
+  width: 0.4rem;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #1e1e24;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #00adb5;
+  border-radius: 8px;
+}
