@@ -27,8 +27,8 @@ export default function Tripdeets() {
   //   ];
 
   return (
-    <div className="flex flex-col fixed gap-4 justify-center text-center right-8">
-      <div className="basicinfo flex flex-row gap-6 justify-center m-6">
+    <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
+      <div className="basicinfo flex flex-row gap-6 justify-center mt-6 bg-white w-max p-4 rounded-2xl font-semibold">
         <h2>{from}</h2>
         <span className="material-symbols-outlined text-blue-700">
           arrow_right_alt

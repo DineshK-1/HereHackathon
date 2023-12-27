@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import H from '@here/maps-api-for-javascript';
 import axios from "axios";
 import { autosuggestAPI } from "../helpers/API";
+import Tripdeets from "../Routes/tripdeets.route";
 
 
 export default function MapElement({ latitude, longitude }) {
@@ -25,6 +26,8 @@ export default function MapElement({ latitude, longitude }) {
 
     const [routingEnabled, setRoutingEnabled] = useState(false);
     const routingGroup = useRef(null);
+
+    const [routingTime, setRoutingTime] = useState();
 
     useEffect(() => {
         if (!latitude) return;
@@ -141,7 +144,7 @@ export default function MapElement({ latitude, longitude }) {
                 bounds: routingGroup.current.getBoundingBox()
             });
 
-            // setRoutingTime({ arrival: result.routes[0].sections[0].arrival.time, departure: result.routes[0].sections[0].departure.time });
+            setRoutingTime({ arrival: result.routes[0].sections[0].arrival.time, departure: result.routes[0].sections[0].departure.time });
             setRoutingEnabled(true);
         };
     };
@@ -222,9 +225,9 @@ export default function MapElement({ latitude, longitude }) {
                         }
                     </div>
                     <div className="flex bg-white p-2 text-blue-300 rounded-full cursor-pointer" onClick={() => {
-                        if(routingEnabled){
+                        if (routingEnabled) {
                             clearRoute();
-                        }else{
+                        } else {
                             searchRoute();
                         }
                     }}>
@@ -232,6 +235,15 @@ export default function MapElement({ latitude, longitude }) {
                     </div>
                 </div>
             </div>
+
+
+            <Tripdeets />
+            <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
+                <div className="flex">
+
+                </div>
+            </div>
+
             <div className='absolute' style={{ width: "100%", height: "90vh" }} ref={mapRef} />
         </>
     )
