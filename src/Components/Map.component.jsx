@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import H from '@here/maps-api-for-javascript';
 import axios from "axios";
-import { autosuggestAPI } from "../helpers/API";
+import { fromLocationAPI, toLocationAPI } from "../helpers/API";
 import Tripdeets from "../Routes/tripdeets.route";
 
 
@@ -13,13 +13,16 @@ export default function MapElement({ latitude, longitude }) {
     const FromRef = useRef(null);
     const toRef = useRef(null);
 
-    const apikey = "Ec-pPDpl8Y62ziZEYCevNt9ouuzyEDxND1Td8FrgUAU";
+    const apikey = "cMxmIwLWuTOB_iK-v0kyWEcrJX2jAlLh3O2a73cENcU";
 
     const router = platform.current?.getRoutingService(null, 8);
     var destination = { lat: latitude, lng: longitude };
 
     const [fromLocation, setFromLocation] = useState({ title: "" });
+    // const [fromLocation, setFromLocation] = useState(fromLocationAPI);
     const [toLocation, setToLocation] = useState({ title: "" });
+    // const [toLocation, setToLocation] = useState(toLocationAPI);
+
 
     const [showFromSuggestions, setShowFromSuggestions] = useState(false);
     const [fromSuggestions, setFromSuggestions] = useState({});
@@ -166,7 +169,7 @@ export default function MapElement({ latitude, longitude }) {
             'transportMode': 'car',
             'origin': `${fromLocation.position.lat},${fromLocation.position.lng}`,
             'destination': `${toLocation.position.lat},${toLocation.position.lng}`,
-            'return': 'polyline,summary,typicalDuration',
+            'return': 'polyline,summary,typicalDuration,turnbyturnactions',
         };
         destination = { lat: toLocation.position.lat, lng: toLocation.position.lng }
         router.calculateRoute(routingParameters, onResult,
@@ -248,7 +251,6 @@ export default function MapElement({ latitude, longitude }) {
                     </div>
                 </div>
             </div>
-
             {
                 routingEnabled &&
                 <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} />

@@ -6,24 +6,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
   const [dropsummary, setDropsummary] = useState(false);
   const [droproute, setDroproute] = useState(false);
 
-  //   const information = [
-  //     {
-  //       header: "16 km",
-  //       body: "distance to destination",
-  //       icon: "directions_car",
-  //     },
-  //     {
-  //       header: "13 mins",
-  //       body: "travel time",
-  //       icon: "access_time",
-  //     },
-  //     {
-  //       header: "250 INR",
-  //       body: "fare estimate",
-  //       icon: "currency_rupee",
-  //     },
-  //   ];
-
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
       <div className="basicinfo flex flex-col gap-2 justify-center mt-6 bg-white w-max p-4 rounded-2xl font-semibold drop-shadow-2xl text-ellipsis" style={{ width: "200px" }}>
@@ -85,33 +67,31 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           )}
         </div>
       </div> */}
-      <div className="sidebar bg-white text-black rounded-xl p-4">
+      <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer" onClick={() => setDroproute(!droproute)}>
         <div>
           <div className="flex justify-center">
             <p className="font-semibold"> Routing Instructions </p>
             <span
               className="material-symbols-outlined"
-              onClick={() => setDroproute(!droproute)}
+
             >
               {droproute ? "expand_less" : "expand_more"}
             </span>
           </div>
           {droproute && (
-            <div className="flex flex-col gap-4 pt-4">
-              <div className="flex flex-row justify-between">
-                <p>Distance</p>
-                <p>16 km</p>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                <p>Travel Time</p>
-                <p>13 mins</p>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                <p>Fare Estimate</p>
-                <p>250 INR</p>
-              </div>
+            <div className="flex flex-col gap-4 pt-4 text-black overflow-y-scroll" style={{height: "400px "}}>
+              {
+                routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction) => {
+                  console.log(tempAction)
+                  return (
+                    <div className="flex w-full justify-between flex-col">
+                      <span className="text-sm">{tempAction?.nextRoad?.name[0].value}</span>
+                      <span className="text-xs">{tempAction?.currentRoad?.name[0].value}</span>
+                      <hr />
+                    </div>
+                  )
+                })
+              }
             </div>
           )}
         </div>
