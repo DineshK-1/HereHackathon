@@ -6,6 +6,13 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
   const [dropsummary, setDropsummary] = useState(false);
   const [droproute, setDroproute] = useState(false);
 
+  const [addwaypoint, setAddwaypoint] = useState(false);
+  const [waypointsearch, setWaypointsearch] = useState("");
+
+  function addmore() {
+    setAddwaypoint(!addwaypoint);
+  }
+
   let metric;
   let tmetric;
 
@@ -21,16 +28,18 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
     }
   }
 
-  function formatTime(timeInMinutes) {
-    if (timeInMinutes >= 60) {
-      const timeInHours = (timeInMinutes / 60).toFixed(2);
+  function formatTime(timeInSeconds) {
+    if (timeInSeconds >= 3600) {
+      const timeInHours = (timeInSeconds / 3600).toFixed(2);
       tmetric = "hr";
       return `${timeInHours}`;
     } else {
+      const timeInMinutes = (timeInSeconds / 60).toFixed(2);
       tmetric = "min";
-      return `${timeInMinutes}  `;
+      return `${timeInMinutes}`;
     }
   }
+
 
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
@@ -44,9 +53,13 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
         <div className="inline-block">
           <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{toLocation.title}</h2>
         </div>      </div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl">
+      {!addwaypoint && (<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={addmore}>
         + Multitrip
-      </button>
+      </button>)}
+      {addwaypoint && (<div className="flex gap-3"><input type="text" />
+        <button onClick={() => setAddwaypoint(false)}><span className="material-symbols-outlined">
+          search
+        </span></button></div>)}
       <div className="summary flex bg-none justify-between">
         <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-blue-800 m-auto leading-3 drop-shadow-2xl">
           <h2>{formatDistance(routingResults.routes[0].sections[0].summary.length)}</h2>
