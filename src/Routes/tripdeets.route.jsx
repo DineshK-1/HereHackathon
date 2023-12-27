@@ -1,10 +1,41 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 // import Infocard from "../Components/Infocard.component";
 
-export default function Tripdeets({ routingResults, fromLocation, toLocation }) {
+export default function Tripdeets({ routingResults, fromLocation, toLocation, latitude, longitude, apikey }) {
+
+  const newRef = useRef(null);
 
   const [dropsummary, setDropsummary] = useState(false);
   const [droproute, setDroproute] = useState(false);
+
+  const [addwaypoint, setAddwaypoint] = useState(false);
+  const [waypointsearch, setWaypointsearch] = useState({ title: "" });
+
+  const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const [toSuggestions, setToSuggestions] = useState({});
+
+  useEffect(() => {
+    if (!latitude) return;
+    if (waypointsearch.title.length <= 3) {
+      setShowToSuggestions(false);
+      return;
+    }
+    if (waypointsearch.id != undefined) {
+      setShowToSuggestions(false);
+      return;
+    }; if (waypointsearch.title.length > 3) {
+      axios.get(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=${latitude},${longitude}&lang=en&q=${waypointsearch.title}&apiKey=${apikey}`).then((res) => {
+        setToSuggestions(res.data);
+      }).finally(() => {
+        setShowToSuggestions(true)
+      })
+    }
+  }, [waypointsearch, latitude, toSuggestions, setToSuggestions])
+
+  function addmore() {
+    setAddwaypoint(!addwaypoint);
+  }
 
   let metric;
   let tmetric;
@@ -21,16 +52,18 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
     }
   }
 
-  function formatTime(timeInMinutes) {
-    if (timeInMinutes >= 60) {
-      const timeInHours = (timeInMinutes / 60).toFixed(2);
+  function formatTime(timeInSeconds) {
+    if (timeInSeconds >= 3600) {
+      const timeInHours = (timeInSeconds / 3600).toFixed(2);
       tmetric = "hr";
       return `${timeInHours}`;
     } else {
+      const timeInMinutes = (timeInSeconds / 60).toFixed(2);
       tmetric = "min";
-      return `${timeInMinutes}  `;
+      return `${timeInMinutes}`;
     }
   }
+  console.log(routingResults)
 
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
@@ -44,9 +77,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
         <div className="inline-block">
           <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{toLocation.title}</h2>
         </div>      </div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl">
-        + Multitrip
-      </button>
       <div className="summary flex bg-none justify-between">
         <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-blue-800 m-auto leading-3 drop-shadow-2xl">
           <h2>{formatDistance(routingResults.routes[0].sections[0].summary.length)}</h2>
@@ -61,6 +91,47 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           <p className="text-blue-800">INR</p>
         </div>
       </div>
+      {!addwaypoint && (<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={addmore}>
+        + Multitrip
+      </button>)}
+      {addwaypoint && (
+        <>
+          <div className="flex gap-3">
+            <input type="text" placeholder="Add more" value={waypointsearch.title} ref={newRef} onChange={(e) => {
+              setWaypointsearch(() => {
+                return {
+                  title: e.target.value
+                }
+              })
+            }} />
+            <button onClick={() => setAddwaypoint(false)}><span className="material-symbols-outlined">
+              close
+            </span></button>
+            {
+              showToSuggestions &&
+              <div className="flex bg-white flex-col absolute w-fit mt-10 overflow-hidden text-black rounded-sm" style={{ width: `${newRef.current && newRef.current.clientWidth}px` }}>
+                {
+                  toSuggestions.items &&
+                  toSuggestions?.items.map((suggestion) => {
+                    return (
+                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { setAddwaypoint(suggestion); setShowToSuggestions(false); }}>
+                        {suggestion.title}
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            }
+          </div>
+
+
+
+          )
+
+
+
+        </>)}
+
       <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
           <div className="flex justify-center">
@@ -75,6 +146,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           {droproute && (
             <div className="flex flex-col gap-4 pt-4 text-black overflow-y-scroll" style={{ height: "400px " }}>
               {
+                routingResults &&
                 routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction, i) => {
                   return (
                     <div key={i} className="flex gap-8">
@@ -91,9 +163,9 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
                         <div className="instructions flex justify-center text-md gap-1">
                           <p className="font-bold">{tempAction?.action}</p>
                           <p className="overflow-hidden whitespace-nowrap">{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
-                          <p className="overflow-hidden whitespace-nowrap"> {tempAction?.nextRoad?.name[0].value}</p>
+                          <p className="overflow-hidden whitespace-nowrap"> {tempAction.nextRoad && tempAction?.nextRoad?.name && tempAction?.nextRoad?.name[0]?.value}</p>
                         </div>
-                        <span className="text-xs">{tempAction?.currentRoad?.name[0].value}</span>
+                        <span className="text-xs">{tempAction.currentRoad && tempAction?.currentRoad?.name && tempAction?.currentRoad?.name[0]?.value}</span>
                         <hr />
                       </div>
                     </div>

@@ -254,7 +254,7 @@ export default function MapElement({ latitude, longitude }) {
       </div>
       {
         routingEnabled &&
-        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} />
+        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} />
       }
       <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
         <div className="flex">
