@@ -1,9 +1,7 @@
 import { useState } from "react";
 // import Infocard from "../Components/Infocard.component";
 
-export default function Tripdeets() {
-  const from = "bandra";
-  const to = "andheri";
+export default function Tripdeets({ routingResults, fromLocation, toLocation }) {
 
   const [dropsummary, setDropsummary] = useState(false);
   const [droproute, setDroproute] = useState(false);
@@ -28,13 +26,16 @@ export default function Tripdeets() {
 
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
-      <div className="basicinfo flex flex-row gap-6 justify-center mt-6 bg-white w-max p-4 rounded-2xl font-semibold drop-shadow-2xl">
-        <h2>{from}</h2>
-        <span className="material-symbols-outlined text-blue-700">
-          arrow_right_alt
+      <div className="basicinfo flex flex-col gap-2 justify-center mt-6 bg-white w-max p-4 rounded-2xl font-semibold drop-shadow-2xl text-ellipsis" style={{ width: "200px" }}>
+        <div className="inline-block">
+          <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{fromLocation.title}</h2>
+        </div>
+        <span className="material-symbols-outlined text-blue-700 items-center">
+          arrow_downward
         </span>
-        <h2>{to}</h2>
-      </div>
+        <div className="inline-block">
+          <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{toLocation.title}</h2>
+        </div>      </div>
       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl">
         + Multitrip
       </button>
