@@ -6,9 +6,35 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
   const [dropsummary, setDropsummary] = useState(false);
   const [droproute, setDroproute] = useState(false);
 
+  let metric;
+  let tmetric;
+
+
+  function formatDistance(distanceInMeters) {
+    if (distanceInMeters >= 1000) {
+      const distanceInKilometers = (distanceInMeters / 1000).toFixed(2);
+      metric = "km";
+      return `${distanceInKilometers}`;
+    } else {
+      metric = "m";
+      return `${distanceInMeters}`;
+    }
+  }
+
+  function formatTime(timeInMinutes) {
+    if (timeInMinutes >= 60) {
+      const timeInHours = (timeInMinutes / 60).toFixed(2);
+      tmetric = "hr";
+      return `${timeInHours}`;
+    } else {
+      tmetric = "min";
+      return `${timeInMinutes}  `;
+    }
+  }
+
   return (
     <div className="z-20 flex flex-col fixed gap-4 text-center right-4 h-full text-black">
-      <div className="basicinfo flex flex-col gap-2 justify-center mt-6 bg-white w-max p-4 rounded-2xl font-semibold drop-shadow-2xl text-ellipsis" style={{ width: "200px" }}>
+      <div className="basicinfo flex flex-col gap-2 justify-center mt-6 bg-white w-full p-4 rounded-2xl font-semibold drop-shadow-2xl text-ellipsis" >
         <div className="inline-block">
           <h2 className="whitespace-nowrap text-ellipsis w-[170px] overflow-hidden inline-block">{fromLocation.title}</h2>
         </div>
@@ -23,16 +49,16 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
       </button>
       <div className="summary flex bg-none justify-between">
         <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-blue-800 m-auto leading-3 drop-shadow-2xl">
-          <h2>16</h2>
-          <p className="text-blue-800">km</p>
-        </div>
-        <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-green-500 m-auto leading-3 drop-shadow-2xl">
-          <h2>16</h2>
-          <p className="text-blue-800">km</p>
+          <h2>{formatDistance(routingResults.routes[0].sections[0].summary.length)}</h2>
+          <p className="text-blue-800">{metric}</p>
         </div>
         <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-red-500 m-auto leading-3 drop-shadow-2xl">
-          <h2>16</h2>
-          <p className="text-blue-800">km</p>
+          <h2>{formatTime(routingResults.routes[0].sections[0].summary.duration)}</h2>
+          <p className="text-blue-800">{tmetric}</p>
+        </div>
+        <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-green-500 m-auto leading-3 drop-shadow-2xl">
+          <h2>160</h2>
+          <p className="text-blue-800">INR</p>
         </div>
       </div>
 
@@ -67,7 +93,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           )}
         </div>
       </div> */}
-      <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer" onClick={() => setDroproute(!droproute)}>
+      <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
           <div className="flex justify-center">
             <p className="font-semibold"> Routing Instructions </p>
@@ -79,15 +105,29 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
             </span>
           </div>
           {droproute && (
-            <div className="flex flex-col gap-4 pt-4 text-black overflow-y-scroll" style={{height: "400px "}}>
+            <div className="flex flex-col gap-4 pt-4 text-black overflow-y-scroll" style={{ height: "400px " }}>
               {
-                routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction) => {
-                  console.log(tempAction)
+                routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction, i) => {
                   return (
-                    <div className="flex w-full justify-between flex-col">
-                      <span className="text-sm">{tempAction?.nextRoad?.name[0].value}</span>
-                      <span className="text-xs">{tempAction?.currentRoad?.name[0].value}</span>
-                      <hr />
+                    <div key={i} className="flex">
+                      <div className="flex flex-col justify-center items-center">
+                        {tempAction?.direction === "left" ? (
+                          <span className="material-symbols-outlined font-bold text-2xl">turn_left</span>
+                        ) : tempAction?.direction === "right" ? (
+                          <span className="material-symbols-outlined">turn_right</span>
+                        ) : (
+                          <span className="material-symbols-outlined">u_turn_right</span>
+                        )}
+                      </div>
+                      <div className="flex w-full justify-between flex-col">
+                        <div className="instructions flex justify-center text-md gap-1">
+                          <p className="font-bold">{tempAction?.action}</p>
+                          <p>{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
+                          <p > {tempAction?.nextRoad?.name[0].value}</p>
+                        </div>
+                        <span className="text-xs">{tempAction?.currentRoad?.name[0].value}</span>
+                        <hr />
+                      </div>
                     </div>
                   )
                 })
