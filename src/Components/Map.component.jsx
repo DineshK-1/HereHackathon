@@ -13,7 +13,7 @@ export default function MapElement({ latitude, longitude }) {
   const FromRef = useRef(null);
   const toRef = useRef(null);
 
-  const apikey = "xliEh-9IGlgHooBU3blPve9WjixVfEPNQdtvcTuVpCo";
+  const apikey = "bMCLNN_jA8HK7q7pldGaHQ8qRkNBQnUiW0Yrqwokwu4";
 
   const router = platform.current?.getRoutingService(null, 8);
   var destination = { lat: latitude, lng: longitude };
@@ -22,6 +22,7 @@ export default function MapElement({ latitude, longitude }) {
   // const [fromLocation, setFromLocation] = useState(fromLocationAPI);
   const [toLocation, setToLocation] = useState({ title: "" });
   // const [toLocation, setToLocation] = useState(toLocationAPI);
+  const [vialocation, setVialocation] = useState({ title: "" })
 
 
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
@@ -111,9 +112,6 @@ export default function MapElement({ latitude, longitude }) {
         const behavior = new H.mapevents.Behavior(
           new H.mapevents.MapEvents(newMap)
         );
-
-
-
         map.current = newMap;
       }
     },
@@ -161,6 +159,7 @@ export default function MapElement({ latitude, longitude }) {
     setRoutingEnabled(false);
   }
 
+
   function searchRoute() {
     if (routingEnabled) {
       clearRoute();
@@ -172,6 +171,11 @@ export default function MapElement({ latitude, longitude }) {
       'destination': `${toLocation.position.lat},${toLocation.position.lng}`,
       'return': 'polyline,summary,typicalDuration,turnbyturnactions',
     };
+
+    if (vialocation?.position !== undefined) {
+      routingParameters['via'] = new H.service.Url.MultiValueQueryParameter([`${vialocation.position.lat},${vialocation.position.lng}`]);
+    }
+
     destination = { lat: toLocation.position.lat, lng: toLocation.position.lng }
     router.calculateRoute(routingParameters, onResult,
       function (error) {
@@ -254,7 +258,7 @@ export default function MapElement({ latitude, longitude }) {
       </div>
       {
         routingEnabled &&
-        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} />
+        <Tripdeets fromLocation={fromLocation} toLocation={toLocation} routingResults={routingResults} latitude={latitude} longitude={longitude} apikey={apikey} setVialocation={setVialocation} />
       }
       <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
         <div className="flex">
