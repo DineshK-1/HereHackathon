@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 // import Infocard from "../Components/Infocard.component";
 
-export default function Tripdeets({ routingResults, fromLocation, toLocation, latitude, longitude, apikey }) {
+export default function Tripdeets({ routingResults, fromLocation, toLocation, latitude, longitude, apikey, setVialocation }) {
 
   const newRef = useRef(null);
 
@@ -31,7 +31,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
         setShowToSuggestions(true)
       })
     }
-  }, [waypointsearch, latitude, toSuggestions, setToSuggestions])
+  }, [toLocation, waypointsearch, latitude])
 
   function addmore() {
     setAddwaypoint(!addwaypoint);
@@ -92,7 +92,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
         </div>
       </div>
       {!addwaypoint && (<button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={addmore}>
-        + Multitrip
+        + Add via points
       </button>)}
       {addwaypoint && (
         <>
@@ -114,7 +114,7 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
                   toSuggestions.items &&
                   toSuggestions?.items.map((suggestion) => {
                     return (
-                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { setAddwaypoint(suggestion); setShowToSuggestions(false); }}>
+                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { setWaypointsearch(suggestion); setAddwaypoint(suggestion); setShowToSuggestions(false); setVialocation(suggestion) }}>
                         {suggestion.title}
                       </div>
                     )
@@ -123,14 +123,9 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation, la
               </div>
             }
           </div>
-
-
-
-          )
-
-
-
         </>)}
+
+      {console.log(showToSuggestions)}
 
       <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
