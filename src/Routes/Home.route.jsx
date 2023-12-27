@@ -1,5 +1,6 @@
 import { useContext } from "react"
 import { LocationContext } from "../Contexts/locationContext"
+import MapElement from "../Components/Map.component";
 
 export default function HomePage() {
 
