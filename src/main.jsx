@@ -5,6 +5,7 @@ import './index.css'
 import Footer from './layout/Footer.layout.jsx';
 import HomePage from './Routes/Home.route.jsx';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { LocationContextProvider } from './Contexts/locationContext.jsx';
 const router = createBrowserRouter([
   {
     element: <Footer />,
@@ -15,5 +16,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+  <LocationContextProvider>
     <RouterProvider router={router} />
+  </LocationContextProvider>
 );
