@@ -163,7 +163,7 @@ export default function MapElement({ latitude, longitude }) {
             'transportMode': 'car',
             'origin': `${fromLocation.position.lat},${fromLocation.position.lng}`,
             'destination': `${toLocation.position.lat},${toLocation.position.lng}`,
-            'return': 'polyline,summary,typicalSummary',
+            'return': 'polyline,summary,typicalDuration',
         };
         destination = { lat: toLocation.position.lat, lng: toLocation.position.lng }
         router.calculateRoute(routingParameters, onResult,
