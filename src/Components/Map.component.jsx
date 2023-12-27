@@ -6,103 +6,103 @@ import Tripdeets from "../Routes/tripdeets.route";
 
 
 export default function MapElement({ latitude, longitude }) {
-    const mapRef = useRef(null);
-    const map = useRef(null);
-    const platform = useRef(null);
+  const mapRef = useRef(null);
+  const map = useRef(null);
+  const platform = useRef(null);
 
-    const FromRef = useRef(null);
-    const toRef = useRef(null);
+  const FromRef = useRef(null);
+  const toRef = useRef(null);
 
-    const apikey = "Ec-pPDpl8Y62ziZEYCevNt9ouuzyEDxND1Td8FrgUAU";
+  const apikey = "Ec-pPDpl8Y62ziZEYCevNt9ouuzyEDxND1Td8FrgUAU";
 
-    const router = platform.current?.getRoutingService(null, 8);
-    var destination = { lat: latitude, lng: longitude };
+  const router = platform.current?.getRoutingService(null, 8);
+  var destination = { lat: latitude, lng: longitude };
 
-    const [fromLocation, setFromLocation] = useState({ title: "" });
-    const [toLocation, setToLocation] = useState({ title: "" });
+  const [fromLocation, setFromLocation] = useState({ title: "" });
+  const [toLocation, setToLocation] = useState({ title: "" });
 
-    const [showFromSuggestions, setShowFromSuggestions] = useState(false);
-    const [fromSuggestions, setFromSuggestions] = useState({});
+  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
+  const [fromSuggestions, setFromSuggestions] = useState({});
 
-    const [routingEnabled, setRoutingEnabled] = useState(false);
-    const routingGroup = useRef(null);
+  const [routingEnabled, setRoutingEnabled] = useState(false);
+  const routingGroup = useRef(null);
 
-    const [routingTime, setRoutingTime] = useState();
+  const [routingTime, setRoutingTime] = useState();
 
-    useEffect(() => {
-        if (!latitude) return;
-        if (fromLocation.title.length <= 3) {
-            setShowFromSuggestions(false);
-            return;
-        }
-        if (fromLocation.id != undefined) {
-            setShowFromSuggestions(false);
-            return;
-        }; if (fromLocation.title.length > 3) {
-            axios.get(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=${latitude},${longitude}&lang=en&q=${fromLocation.title}&apiKey=${apikey}`).then((res) => {
-                setFromSuggestions(res.data);
-            }).finally(() => {
+  useEffect(() => {
+    if (!latitude) return;
+    if (fromLocation.title.length <= 3) {
+      setShowFromSuggestions(false);
+      return;
+    }
+    if (fromLocation.id != undefined) {
+      setShowFromSuggestions(false);
+      return;
+    }; if (fromLocation.title.length > 3) {
+      axios.get(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=${latitude},${longitude}&lang=en&q=${fromLocation.title}&apiKey=${apikey}`).then((res) => {
+          setFromSuggestions(res.data);
+}).finally(() => {
                 setShowFromSuggestions(true)
-            })
-        }
-    }, [fromLocation, latitude, fromSuggestions, setFromSuggestions])
+        })
+            }
+  }, [fromLocation, latitude, fromSuggestions, setFromSuggestions])
 
-    const [showToSuggestions, setShowToSuggestions] = useState(false);
-    const [toSuggestions, setToSuggestions] = useState({});
+  const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const [toSuggestions, setToSuggestions] = useState({});
 
-    useEffect(() => {
-        if (!latitude) return;
-        if (toLocation.title.length <= 3) {
-            setShowToSuggestions(false);
-            return;
-        }
-        if (toLocation.id != undefined) {
-            setShowToSuggestions(false);
-            return;
-        };
-        if (toLocation.title.length > 3) {
-            axios.get(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=${latitude},${longitude}&lang=en&q=${toLocation.title}&apiKey=${apikey}`).then((res) => {
-                setToSuggestions(res.data);
-            }).finally(() => {
+  useEffect(() => {
+    if (!latitude) return;
+    if (toLocation.title.length <= 3) {
+      setShowToSuggestions(false);
+      return;
+    }
+    if (toLocation.id != undefined) {
+      setShowToSuggestions(false);
+      return;
+    };
+    if (toLocation.title.length > 3) {
+      axios.get(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=${latitude},${longitude}&lang=en&q=${toLocation.title}&apiKey=${apikey}`).then((res) => {
+          setToSuggestions(res.data);
+}).finally(() => {
                 setShowToSuggestions(true)
-            })
-        }
-    }, [toLocation, latitude, toSuggestions, setToSuggestions])
+        })
+            }
+  }, [toLocation, latitude, toSuggestions, setToSuggestions])
 
-
+  
     useEffect(
         () => {
-            if (!latitude) return;
+    if (!latitude) return;
 
-            if (!map.current) {
-                platform.current = new H.service.Platform({ apikey });
-                var defaultLayers = platform.current.createDefaultLayers();
+    if (!map.current) {
+      platform.current = new H.service.Platform({ apikey });
+      var defaultLayers = platform.current.createDefaultLayers();
 
-                const newMap = new H.Map(mapRef.current, defaultLayers.vector.normal.map, {
-                    center: { lat: latitude, lng: longitude },
-                    zoom: 16,
-                    padding: { top: 50, right: 50, bottom: 50, left: 50 },
-                    pixelRatio: window.devicePixelRatio || 1
+      const newMap = new H.Map(mapRef.current, defaultLayers.vector.normal.map, {
+          center: { lat: latitude, lng: longitude },
+          zoom: 16,
+          padding: { top: 50, right: 50, bottom: 50, left: 50 },
+          pixelRatio: window.devicePixelRatio || 1
                 });
 
-                var ui = H.ui.UI.createDefault(newMap, defaultLayers);
+      var ui = H.ui.UI.createDefault(newMap, defaultLayers);
 
-                newMap.addEventListener('pointermove', function (event) {
-                    if (event.target instanceof H.map.Marker) {
-                        newMap.getViewPort().element.style.cursor = 'pointer';
-                    } else {
-                        newMap.getViewPort().element.style.cursor = 'auto';
-                    }
-                }, false);
+      newMap.addEventListener('pointermove', function (event) {
+          if (event.target instanceof H.map.Marker) {
+            newMap.getViewPort().element.style.cursor = 'pointer';
+          } else {
+            newMap.getViewPort().element.style.cursor = 'auto';
+          }
+        }, false);
 
-                window.addEventListener('resize', () => newMap.getViewPort().resize());
-                var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 10);
-                newMap.addObject(currentLocation);
-                var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 125);
+      window.addEventListener('resize', () => newMap.getViewPort().resize());
+      var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 10);
+      newMap.addObject(currentLocation);
+      var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 125);
 
-                newMap.addLayer(defaultLayers.vector.traffic.map);
+      newMap.addLayer(defaultLayers.vector.traffic.map);
 
-                const behavior = new H.mapevents.Behavior(
+const behavior = new H.mapevents.Behavior(
                     new H.mapevents.MapEvents(newMap)
                 );
 
@@ -131,28 +131,28 @@ export default function MapElement({ latitude, longitude }) {
                 }
             });
 
-            const startMarker = new H.map.Marker({ lat: fromLocation.position.lat, lng: fromLocation.position.lng });
+      const startMarker = new H.map.Marker({ lat: fromLocation.position.lat, lng: fromLocation.position.lng });
 
-            const endMarker = new H.map.Marker(destination);
+      const endMarker = new H.map.Marker(destination);
 
-            routingGroup.current = new H.map.Group();
-            routingGroup.current.addObjects([routeLine, startMarker, endMarker]);
+      routingGroup.current = new H.map.Group();
+      routingGroup.current.addObjects([routeLine, startMarker, endMarker]);
 
-            map.current.addObject(routingGroup.current);
+      map.current.addObject(routingGroup.current);
 
-            map.current.getViewModel().setLookAtData({
-                bounds: routingGroup.current.getBoundingBox()
-            });
+      map.current.getViewModel().setLookAtData({
+        bounds: routingGroup.current.getBoundingBox()
+      });
 
-            setRoutingTime({ arrival: result.routes[0].sections[0].arrival.time, departure: result.routes[0].sections[0].departure.time });
-            setRoutingEnabled(true);
-        };
+      setRoutingTime({ arrival: result.routes[0].sections[0].arrival.time, departure: result.routes[0].sections[0].departure.time });
+      setRoutingEnabled(true);
     };
+  };
 
-    function clearRoute() {
-        map.current.removeObject(routingGroup.current);
-        setRoutingEnabled(false);
-    }
+  function clearRoute() {
+    map.current.removeObject(routingGroup.current);
+    setRoutingEnabled(false);
+  }
 
     function searchRoute() {
         if (routingEnabled) {
