@@ -51,9 +51,9 @@ export default function Tripdeets() {
           </div>
           {dropsummary && (
             <div className="flex flex-col gap-4 pt-4">
-              <div className="flex flex-row justify-between">
-                <p>Distance</p>
-                <p>16 km</p>
+              <div className="flex flex-col rounded-full w-fit p-4" style={{border: "3px black solid"}}>
+                <p>16</p>
+                <span className="text-xs">Km</span>
               </div>
               <hr />
               <div className="flex flex-row justify-between">

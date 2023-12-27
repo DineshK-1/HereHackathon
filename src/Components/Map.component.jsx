@@ -127,7 +127,7 @@ export default function MapElement({ latitude, longitude }) {
             const routeLine = new H.map.Polyline(multiLineString, {
                 style: {
                     strokeColor: 'blue',
-                    lineWidth: 5
+                    lineWidth: 4
                 }
             });
 
@@ -170,6 +170,16 @@ export default function MapElement({ latitude, longitude }) {
             function (error) {
                 alert(error.message);
             });
+    }
+
+    function zoomToLocation() {
+        map.current.getViewModel().setLookAtData({
+            position: {
+                lat: latitude,
+                lng: longitude
+            },
+            zoom: 17
+        })
     }
 
     return (
@@ -236,14 +246,20 @@ export default function MapElement({ latitude, longitude }) {
                 </div>
             </div>
 
-
-            <Tripdeets />
+            {
+                routingEnabled &&
+                <Tripdeets />
+            }
             <div className="absolute flex flex-col bg-white right-0 top-0 z-20 text-black">
                 <div className="flex">
 
                 </div>
             </div>
-
+            <div className="flex fixed bottom-20 mb-5 left-2 z-20">
+                <span className={`material-symbols-outlined text-blue-500 bg-white p-3 rounded-xl select-none cursor-pointer`} onClick={zoomToLocation}>
+                    my_location
+                </span>
+            </div>
             <div className='absolute' style={{ width: "100%", height: "90vh" }} ref={mapRef} />
         </>
     )
