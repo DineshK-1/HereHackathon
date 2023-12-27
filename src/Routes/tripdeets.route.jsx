@@ -61,38 +61,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           <p className="text-blue-800">INR</p>
         </div>
       </div>
-
-      {/* <div className="sidebar bg-white text-black rounded-xl p-4">
-        <div>
-          <div className="flex justify-center">
-            <p className="font-semibold"> Trip Summary </p>
-            <span
-              className="material-symbols-outlined"
-              onClick={() => setDropsummary(!dropsummary)}
-            >
-              {dropsummary ? "expand_less" : "expand_more"}
-            </span>
-          </div>
-          {dropsummary && (
-            <div className="flex flex-col gap-4 pt-4">
-              <div className="flex flex-col rounded-full w-fit p-4" style={{border: "3px black solid"}}>
-                <p>16</p>
-                <span className="text-xs">Km</span>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                <p>Travel Time</p>
-                <p>13 mins</p>
-              </div>
-              <hr />
-              <div className="flex flex-row justify-between">
-                <p>Fare Estimate</p>
-                <p>250 INR</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div> */}
       <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
           <div className="flex justify-center">
@@ -109,8 +77,8 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
               {
                 routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction, i) => {
                   return (
-                    <div key={i} className="flex">
-                      <div className="flex flex-col justify-center items-center">
+                    <div key={i} className="flex gap-8">
+                      <div className="flex justify-center items-center">
                         {tempAction?.direction === "left" ? (
                           <span className="material-symbols-outlined font-bold text-2xl">turn_left</span>
                         ) : tempAction?.direction === "right" ? (
@@ -122,8 +90,8 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
                       <div className="flex w-full justify-between flex-col">
                         <div className="instructions flex justify-center text-md gap-1">
                           <p className="font-bold">{tempAction?.action}</p>
-                          <p>{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
-                          <p > {tempAction?.nextRoad?.name[0].value}</p>
+                          <p className="overflow-hidden whitespace-nowrap">{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
+                          <p className="overflow-hidden whitespace-nowrap"> {tempAction?.nextRoad?.name[0].value}</p>
                         </div>
                         <span className="text-xs">{tempAction?.currentRoad?.name[0].value}</span>
                         <hr />
@@ -136,17 +104,6 @@ export default function Tripdeets({ routingResults, fromLocation, toLocation }) 
           )}
         </div>
       </div>
-
-      {/* <div className="infocards flex flex-col gap-10">
-        {information.map((info) => (
-          <Infocard
-            key={info.icon}
-            header={info.header}
-            body={info.body}
-            icon={info.icon}
-          />
-        ))}
-      </div> */}
     </div>
   );
 }
