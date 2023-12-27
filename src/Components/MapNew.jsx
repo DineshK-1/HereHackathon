@@ -17,7 +17,7 @@ export default function MapNew() {
     const map = useRef(null);
     const platform = useRef(null);
 
-    const apikey = "bMCLNN_jA8HK7q7pldGaHQ8qRkNBQnUiW0Yrqwokwu4";
+    const apikey = "E1RQs4gDilxM4-hVVPH4tfHM8KUSpVvTTJXPbrnaX98";
 
     const router = platform.current?.getRoutingService(null, 8);
     var destination = { lat: latitude, lng: longitude };
@@ -176,15 +176,45 @@ export default function MapNew() {
         };
     };
 
+    function assignID() {
+        axios.post(`https://hereapi-emergency.up.railway.app/assign_id?case_id=${selectedIncident.id}&assignment=${selectedVehicle.id}`).then(() => {
+            getIncidents();
+        }).finally(() => {
+            searchRoute();
+        })
+    }
+
     function clearRoute() {
+        setSelectedIncident()
+        setSelectedVehicles()
         map.current.removeObject(routingGroup.current);
         setRoutingEnabled(false);
     }
 
-    function searchRoute() {
-        console.log("hiii")
-        if (routingEnabled) {
+    function searchArea(inci, cops) {
+        const routingParameters = {
+            'routingMode': 'fast',
+            'transportMode': 'car',
+            'origin': `${inci.lat},${inci.lng}`,
+            'destination': `${cops.lat},${cops.lng}`,
+            'return': 'polyline',
+        };
+
+        destination = { lat: cops.lat, lng: cops.lng }
+        router.calculateRoute(routingParameters, onResult,
+            function (error) {
+                alert(error.message);
+            });
+    }
+
+    function searchRoute(switchh = false) {
+        if (routingEnabled && !switchh) {
             clearRoute();
+        }
+        if (switchh) {
+            if (routingEnabled) {
+                map.current.removeObject(routingGroup.current);
+            }
         }
         if (selectedIncident && selectedVehicle) {
             const routingParameters = {
@@ -195,7 +225,6 @@ export default function MapNew() {
                 'return': 'polyline',
             };
 
-            console.log("hi")
             destination = { lat: selectedVehicle.lat, lng: selectedVehicle.lng }
             router.calculateRoute(routingParameters, onResult,
                 function (error) {
@@ -224,12 +253,16 @@ export default function MapNew() {
         })
     }
 
-
+    useEffect(() => {
+        if (selectedIncident && selectedIncident) {
+            searchRoute(true)
+        }
+    }, [selectedIncident, selectedVehicle])
 
     const [incidents, setIncidents] = useState();
 
     useEffect(() => {
-        if (map.current == null) return;
+        if (map.current == null || policeIncidentsGroup.current === null) return;
         if (incidents?.emergencies) {
             // map.current.removeObject(policeIncidentsGroup.current);
             policeIncidentsGroup.current = new H.map.Group();
@@ -240,19 +273,13 @@ export default function MapNew() {
             })
             map.current.addObject(policeIncidentsGroup.current);
         }
-    }, [incidents, map])
+    }, [incidents, map, policeIncidentsGroup])
 
     function getIncidents() {
         axios.get('https://hereapi-emergency.up.railway.app/get_emergencies').then((res) => {
             setIncidents(res.data)
         })
     }
-
-    useEffect(() => {
-        getIncidents();
-    }, [])
-
-    console.log(latitude, longitude)
 
     return (
         <>
@@ -264,31 +291,77 @@ export default function MapNew() {
                         incidents.emergencies.map((inci, idx) => {
                             var date = new Date(inci.created_time)
                             return (
-                                <div key={idx} className={"flex flex-col p-2 rounded-lg " + (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400")} onClick={() => { zoomToCoords({ lat: inci.lat, lng: inci.lng }); setSelectedIncident(inci) }}>
-                                    <div className="flex justify-between p-2 rounded-lg cursor-pointer select-none">
+                                <div key={idx} className={"flex flex-col p-2 rounded-lg cursor-pointer select-none " + (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400") + (inci.scene_type === "success" ? " bg-green-500" : "")} onClick={() => {
+                                    // if (routingGroup.current && routingEnabled) {
+                                    //     map.current.removeObject(routingGroup.current);
+                                    //     setRoutingEnabled(false);
+                                    // }
+                                    if (inci.assigned_id !== null) {
+                                        setSelectedIncident(inci)
+
+                                        searchArea(inci, dummyCops.find((cop) => {
+                                            if (cop.id === parseInt(inci.assigned_id)) {
+                                                return cop;
+                                            }
+                                        }))
+                                    } else {
+                                        zoomToCoords({ lat: inci.lat, lng: inci.lng }); setSelectedIncident(inci)
+                                    }
+                                }
+                                }>
+                                    <div className="flex justify-between p-2 rounded-lg">
                                         {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
                                         <div className="flex">
                                             <span className="material-symbols-outlined">keyboard_arrow_down</span>
                                         </div>
                                     </div>
-                                    <div className="flex">
-                                        {
-                                            false ?
-                                                "Assigned to #1"
+                                    {
+                                        inci.scene_type === "success" ? "" :
+                                            <>
+                                                <div className="flex text-center w-full justify-center text-sm">
+                                                    {
+                                                        inci.assigned_id ?
+                                                            `Assigned to ${inci.assigned_id}`
 
-                                                :
+                                                            :
 
-                                                "No one assigned"
-                                        }
-                                    </div>
-
+                                                            "No one assigned"
+                                                    }
+                                                </div>
+                                                <div className="flex text-xs p-2 bg-blue-500 w-fit rounded-lg self-center" onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation();
+                                                    axios.post(`https://hereapi-emergency.up.railway.app/change_type?type=success&case_id=${inci.id}`).then(() => {
+                                                        getIncidents();
+                                                    })
+                                                }}>
+                                                    Mark as Responded
+                                                </div>
+                                            </>
+                                    }
                                 </div>
                             )
                         })
                     }
+                    {
+                        !incidents?.emergencies &&
+                        <div className="flex p-2 text-gray-400">
+                            No incidents available.
+                        </div>
+                    }
                 </div>
             </div>
-            <div className="flex fixed top-10 left-2 z-20 w-full justify-center">
+            <div className="flex fixed top-10 left-2 z-20 w-full justify-center items-center">
+                {
+                    routingEnabled &&
+                    <div className="flex bg-white p-2 text-black w-fit h-fit rounded-lg mx-2 select-none cursor-pointer" onClick={clearRoute}>
+                        <span className={`material-symbols-outlined`}>
+                            close
+                        </span>
+                        Clear Route
+                    </div>
+                }
+
                 <div className="flex flex-col w-fit  gap-2 justify-center">
                     <div className="flex text-blue-500 bg-white p-3 rounded-xl select-none cursor-pointer" onClick={getIncidents}>
                         <span className={`material-symbols-outlined `}>
@@ -298,7 +371,7 @@ export default function MapNew() {
                     </div>
                     {
                         (selectedIncident && selectedVehicle) &&
-                        <div onClick={searchRoute} className="flex text-blue-500 bg-white p-3 rounded-xl select-none cursor-pointer items-center">
+                        <div onClick={assignID} className="flex text-blue-500 bg-white p-3 rounded-xl select-none cursor-pointer items-center">
                             <span className={`material-symbols-outlined `}>
                                 add
                             </span>
@@ -308,7 +381,6 @@ export default function MapNew() {
 
                 </div>
             </div>
-
             <div className="flex fixed bottom-20 mb-5 left-2 z-20">
                 <span className={`material-symbols-outlined text-blue-500 bg-white p-3 rounded-xl select-none cursor-pointer`} onClick={zoomToLocation}>
                     my_location
