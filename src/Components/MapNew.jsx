@@ -212,7 +212,7 @@ export default function MapNew() {
             clearRoute();
         }
         if (switchh) {
-            if (routingEnabled) {
+            if (routingEnabled && routingGroup.current !== null) {
                 map.current.removeObject(routingGroup.current);
             }
         }
@@ -291,7 +291,7 @@ export default function MapNew() {
                         incidents.emergencies.map((inci, idx) => {
                             var date = new Date(inci.created_time)
                             return (
-                                <div key={idx} className={"flex flex-col p-2 rounded-lg cursor-pointer select-none " + (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400") + (inci.scene_type === "success" ? " bg-green-500" : "")} onClick={() => {
+                                <div key={idx} className={"flex flex-col p-2 rounded-lg cursor-pointer select-none " +  (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))} onClick={() => {
                                     // if (routingGroup.current && routingEnabled) {
                                     //     map.current.removeObject(routingGroup.current);
                                     //     setRoutingEnabled(false);
