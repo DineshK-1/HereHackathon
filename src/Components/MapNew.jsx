@@ -286,7 +286,7 @@ export default function MapNew() {
             var policeIcon = new H.map.Icon(PoliceEmergency);
             var ambulance = new H.map.Icon(AmbualnceIcon);
             incidents.emergencies.forEach((inci) => {
-                if(inci.scene_type === "success") return;
+                if (inci.scene_type === "success") return;
                 if (inci.type === "police") {
                     const marker = new H.map.Marker({ lat: inci.lat, lng: inci.lng }, { icon: policeIcon });
                     policeIncidentsGroup.current?.addObject(marker)
@@ -297,6 +297,7 @@ export default function MapNew() {
 
             })
             map.current.addObject(policeIncidentsGroup.current);
+            map.current.addObject(ambulanceIncidentsGroup.current);
         }
     }, [incidents, map, policeIncidentsGroup])
 
@@ -335,6 +336,17 @@ export default function MapNew() {
                                     }
                                 }
                                 }>
+                                    <div className="flex p-1">
+                                        {
+                                            inci.type === "police" ?
+                                                <span className={`material-symbols-outlined text-red-500`}>
+                                                    local_police
+                                                </span> :
+                                                <span className={`material-symbols-outlined`}>
+                                                    ambulance
+                                                </span>
+                                        }
+                                    </div>
                                     <div className="flex justify-between p-2 rounded-lg">
                                         {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
                                         <div className="flex">
@@ -376,12 +388,24 @@ export default function MapNew() {
                             if (inci.scene_type !== "success") return;
                             return (
                                 <div key={idx} className={"flex flex-col p-1 rounded-lg select-none text-sm " + (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))}>
-                                    <div className="flex justify-between p-2 rounded-lg">
+                                    <div className="flex">
+                                        {
+                                            inci.type === "police" ? 
+                                            <span className={`material-symbols-outlined text-red-500`}>
+                                            local_police
+                                        </span>:
+                                        <span className={`material-symbols-outlined`}>
+                                        ambulance
+                                    </span>
+                                        }
+                                    </div>
+                                    <div className="flex justify-between p-1 rounded-lg items-center">
                                         {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
-                                        <div className="flex">
-                                            <span className="material-symbols-outlined">keyboard_arrow_down</span>
+                                        <div className="flex p-2">
+                                            <span className="material-symbols-outlined ">keyboard_arrow_down</span>
                                         </div>
                                     </div>
+                                    
                                     {
                                         inci.scene_type === "success" ? "" :
                                             <>
