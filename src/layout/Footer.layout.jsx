@@ -19,7 +19,7 @@ export default function Footer() {
             className="flex flex-col items-center cursor-pointer text-cyan-300 hover:text-white"
           >
             <span className="material-symbols-outlined">local_police</span>
-            100
+            Emergency Services
           </NavLink>
         </nav>
       </div>

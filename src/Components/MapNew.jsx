@@ -103,6 +103,8 @@ export default function MapNew() {
                 var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 10);
                 newMap.addObject(currentLocation);
                 var currentLocation = new H.map.Circle({ lat: latitude, lng: longitude }, 125);
+                policeIncidentsGroup.current = new H.map.Group();
+                ambulanceIncidentsGroup.current = new H.map.Group();
 
                 newMap.addLayer(defaultLayers.vector.traffic.map);
 
@@ -110,36 +112,9 @@ export default function MapNew() {
                     new H.mapevents.MapEvents(newMap)
                 );
 
-                var policeIcon = new H.map.Icon(PoliceIcon);
-                var ambulanceIcon = new H.map.Icon(AmbualnceIcon);
-
-                policeGroup.current = new H.map.Group();
-                ambulanceGroup.current = new H.map.Group();
-
-                policeIncidentsGroup.current = new H.map.Group();
-                ambulanceIncidentsGroup.current = new H.map.Group();
-
-                dummyCops.forEach((police) => {
-                    if (police.type == "police") {
-                        const markerPolice = new H.map.Marker({ lat: police.lat, lng: police.lng }, { icon: policeIcon });
-                        markerPolice.addEventListener("tap", function () {
-                            setSelectedVehicles(police)
-                        })
-                        policeGroup.current.addObject(markerPolice)
-                    } else {
-                        const marketAmbu = new H.map.Marker({ lat: police.lat, lng: police.lng }, { icon: ambulanceIcon });
-                        marketAmbu.addEventListener("tap", function () {
-                            setSelectedVehicles(police)
-                        })
-                        ambulanceGroup.current.addObject(marketAmbu)
-                    }
-
-                })
-
-                newMap.addObject(policeGroup.current);
-                newMap.addObject(ambulanceGroup.current);
-
                 map.current = newMap;
+
+                renderCops();
             }
         },
 
@@ -187,9 +162,56 @@ export default function MapNew() {
     function clearRoute() {
         setSelectedIncident()
         setSelectedVehicles()
-        map.current.removeObject(routingGroup.current);
+
         setRoutingEnabled(false);
     }
+
+    function renderCops() {
+
+        var policeIcon = new H.map.Icon(PoliceIcon);
+        var ambulanceIcon = new H.map.Icon(AmbualnceIcon);
+
+        policeGroup.current = new H.map.Group();
+        ambulanceGroup.current = new H.map.Group();
+
+        dummyCops.forEach((police) => {
+            if (police.type == "police") {
+                const markerPolice = new H.map.Marker({ lat: police.lat, lng: police.lng }, { icon: policeIcon });
+                markerPolice.addEventListener("tap", function () {
+                    setSelectedVehicles(police)
+                })
+                policeGroup.current.addObject(markerPolice)
+            } else {
+                const marketAmbu = new H.map.Marker({ lat: police.lat, lng: police.lng }, { icon: ambulanceIcon });
+                marketAmbu.addEventListener("tap", function () {
+                    setSelectedVehicles(police)
+                })
+                ambulanceGroup.current.addObject(marketAmbu)
+            }
+
+        })
+
+        map.current.addObject(policeGroup.current);
+        map.current.addObject(ambulanceGroup.current);
+    }
+
+    useEffect(() => {
+        if (routingEnabled) return;
+        if (!map.current) return;
+        var objs = map.current.getObjects().filter((obj) => {
+            if (obj instanceof H.map.Group) {
+                map.current.removeObject(obj)
+            }
+        });
+        getIncidents();
+        renderCops();
+    }, [routingEnabled, map])
+
+    useEffect(() => {
+        if (map.current) {
+            renderCops();
+        }
+    }, [map])
 
     function searchArea(inci, cops) {
         const routingParameters = {
@@ -208,13 +230,8 @@ export default function MapNew() {
     }
 
     function searchRoute(switchh = false) {
-        if (routingEnabled && !switchh) {
-            clearRoute();
-        }
-        if (switchh) {
-            if (routingEnabled && routingGroup.current !== null) {
-                map.current.removeObject(routingGroup.current);
-            }
+        if (routingEnabled) {
+            setRoutingEnabled(false);
         }
         if (selectedIncident && selectedVehicle) {
             const routingParameters = {
@@ -267,9 +284,17 @@ export default function MapNew() {
             // map.current.removeObject(policeIncidentsGroup.current);
             policeIncidentsGroup.current = new H.map.Group();
             var policeIcon = new H.map.Icon(PoliceEmergency);
+            var ambulance = new H.map.Icon(AmbualnceIcon);
             incidents.emergencies.forEach((inci) => {
-                const marker = new H.map.Marker({ lat: inci.lat, lng: inci.lng }, { icon: policeIcon });
-                policeIncidentsGroup.current?.addObject(marker)
+                if(inci.scene_type === "success") return;
+                if (inci.type === "police") {
+                    const marker = new H.map.Marker({ lat: inci.lat, lng: inci.lng }, { icon: policeIcon });
+                    policeIncidentsGroup.current?.addObject(marker)
+                } else {
+                    const marker = new H.map.Marker({ lat: inci.lat, lng: inci.lng }, { icon: ambulance });
+                    ambulanceIncidentsGroup.current?.addObject(marker)
+                }
+
             })
             map.current.addObject(policeIncidentsGroup.current);
         }
@@ -283,15 +308,16 @@ export default function MapNew() {
 
     return (
         <>
-            <div className="z-20 flex flex-col fixed gap-4 text-center right-0 h-full text-black bg-white p-2">
+            <div className="z-30 flex flex-col fixed gap-4 text-center right-0 h-full text-black bg-white p-2">
                 Incidents
                 <div className="flex flex-col gap-2">
                     {
                         incidents?.emergencies &&
                         incidents.emergencies.map((inci, idx) => {
                             var date = new Date(inci.created_time)
+                            if (inci.scene_type === "success") return;
                             return (
-                                <div key={idx} className={"flex flex-col p-2 rounded-lg cursor-pointer select-none " +  (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))} onClick={() => {
+                                <div key={idx} className={"flex flex-col p-1 rounded-lg cursor-pointer select-none text-sm " + (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))} onClick={() => {
                                     // if (routingGroup.current && routingEnabled) {
                                     //     map.current.removeObject(routingGroup.current);
                                     //     setRoutingEnabled(false);
@@ -309,6 +335,47 @@ export default function MapNew() {
                                     }
                                 }
                                 }>
+                                    <div className="flex justify-between p-2 rounded-lg">
+                                        {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
+                                        <div className="flex">
+                                            <span className="material-symbols-outlined">keyboard_arrow_down</span>
+                                        </div>
+                                    </div>
+                                    {
+                                        inci.scene_type === "success" ? "" :
+                                            <>
+                                                <div className="flex text-center w-full justify-center text-sm">
+                                                    {
+                                                        inci.assigned_id ?
+                                                            `Assigned to ${inci.assigned_id}`
+
+                                                            :
+
+                                                            "No one assigned"
+                                                    }
+                                                </div>
+                                                <div className="flex text-xs p-2 mt-3 bg-blue-500 w-fit rounded-lg self-center" onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation();
+                                                    axios.post(`https://hereapi-emergency.up.railway.app/change_type?type=success&case_id=${inci.id}`).then(() => {
+                                                        getIncidents();
+                                                    })
+                                                }}>
+                                                    Mark as Responded
+                                                </div>
+                                            </>
+                                    }
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        incidents?.emergencies &&
+                        incidents.emergencies.map((inci, idx) => {
+                            var date = new Date(inci.created_time)
+                            if (inci.scene_type !== "success") return;
+                            return (
+                                <div key={idx} className={"flex flex-col p-1 rounded-lg select-none text-sm " + (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))}>
                                     <div className="flex justify-between p-2 rounded-lg">
                                         {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
                                         <div className="flex">
@@ -352,6 +419,12 @@ export default function MapNew() {
                 </div>
             </div>
             <div className="flex fixed top-10 left-2 z-20 w-full justify-center items-center">
+                {
+                    selectedVehicle &&
+                    <div className="flex bg-white text-black p-2 rounded-lg text-sm">
+                        Selected {selectedVehicle.type === "police" ? "Police" : "Ambulance"} #{selectedVehicle.id}
+                    </div>
+                }
                 {
                     routingEnabled &&
                     <div className="flex bg-white p-2 text-black w-fit h-fit rounded-lg mx-2 select-none cursor-pointer" onClick={clearRoute}>
