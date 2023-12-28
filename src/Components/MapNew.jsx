@@ -348,7 +348,7 @@ export default function MapNew() {
 
                 </div>
             }
-            <div className="z-30 flex flex-col fixed gap-4 text-center right-0 h-screen overflow-y-auto text-black bg-white p-2">
+            <div className="z-30 flex flex-col mt-4 mr-4 rounded-xl fixed gap-4 text-center right-0 h-screen overflow-y-auto text-black bg-white p-2" style={{maxHeight: "85vh"}}>
                 Incidents
                 <div className="flex flex-col gap-2">
                     {
@@ -378,7 +378,7 @@ export default function MapNew() {
                                     <div className="flex p-1">
                                         {
                                             inci.type === "police" ?
-                                                <span className={`material-symbols-outlined text-red-500`}>
+                                                <span className={`material-symbols-outlined`}>
                                                     local_police
                                                 </span> :
                                                 <span className={`material-symbols-outlined`}>
@@ -430,7 +430,7 @@ export default function MapNew() {
                                     <div className="flex">
                                         {
                                             inci.type === "police" ?
-                                                <span className={`material-symbols-outlined text-red-500`}>
+                                                <span className={`material-symbols-outlined`}>
                                                     local_police
                                                 </span> :
                                                 <span className={`material-symbols-outlined`}>
