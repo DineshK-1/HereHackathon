@@ -17,7 +17,7 @@ export default function MapNew() {
     const map = useRef(null);
     const platform = useRef(null);
 
-    const apikey = "E1RQs4gDilxM4-hVVPH4tfHM8KUSpVvTTJXPbrnaX98";
+    const apikey = "XFPTW9372jRU8QoSFlXDbpAgL8JYciNBQU5M";
 
     const router = platform.current?.getRoutingService(null, 8);
     var destination = { lat: latitude, lng: longitude };
