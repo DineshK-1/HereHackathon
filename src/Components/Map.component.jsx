@@ -120,7 +120,6 @@ export default function MapElement({ latitude, longitude }) {
   );
   const onResult = function (result) {
     if (result.routes.length) {
-      console.log(result)
       const lineStrings = [];
       result.routes[0].sections.forEach((section) => {
         lineStrings.push(H.geo.LineString.fromFlexiblePolyline(section.polyline));
@@ -141,14 +140,12 @@ export default function MapElement({ latitude, longitude }) {
 
       let viaMarker;
 
-      console.log(vialocation)
 
       if (vialocation && vialocation.position) {
         viaMarker = new H.map.Marker({ lat: vialocation.position.lat, lng: vialocation.position.lng });
       }
 
       routingGroup.current = new H.map.Group();
-      console.log(routeLine, startMarker, endMarker)
       routingGroup.current.addObjects([routeLine, startMarker, endMarker]);
 
       if (vialocation && vialocation.title !== "") {
@@ -164,11 +161,11 @@ export default function MapElement({ latitude, longitude }) {
       setRoutingResults(result);
       result.routes[0].sections.forEach((section) => {
         setRoutingTime((x) => {
-          let temp = {...x};
-          if(temp["arrival"]){
+          let temp = { ...x };
+          if (temp["arrival"]) {
             temp["arrival"] += section.arrival.time
             temp["departure"] += section.departure.time;
-          }else{
+          } else {
             return { arrival: section.arrival.time, departure: section.departure.time }
           }
         });

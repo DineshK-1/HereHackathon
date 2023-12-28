@@ -120,7 +120,7 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
                   toSuggestions.items &&
                   toSuggestions?.items.map((suggestion) => {
                     return (
-                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { console.log("hello"); setWaypointsearch(suggestion); setAddwaypoint(suggestion); setShowToSuggestions(false); setVialocation(suggestion) }}>
+                      <div className="flex p-2 text-xs select-none cursor-pointer" key={suggestion.id} onClick={() => { setWaypointsearch(suggestion); setAddwaypoint(suggestion); setShowToSuggestions(false); setVialocation(suggestion) }}>
                         {suggestion.title}
                       </div>
                     )

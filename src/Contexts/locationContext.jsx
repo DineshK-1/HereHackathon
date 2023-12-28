@@ -16,7 +16,7 @@ export const LocationContextProvider = ({ children }) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(success, error);
         } else {
-            console.log("Geolocation not supported");
+            alert("Geolocation not supported");
         }
     }
 
@@ -27,7 +27,7 @@ export const LocationContextProvider = ({ children }) => {
     }
 
     function error() {
-        console.log("Unable to retrieve your location");
+        alert("Unable to retrieve your location");
     }
 
     return <LocationContext.Provider value={location}>{children}</LocationContext.Provider>
