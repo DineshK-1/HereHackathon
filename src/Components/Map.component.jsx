@@ -162,7 +162,17 @@ export default function MapElement({ latitude, longitude }) {
       });
 
       setRoutingResults(result);
-      setRoutingTime({ arrival: result.routes[0].sections[0].arrival.time, departure: result.routes[0].sections[0].departure.time });
+      result.routes[0].sections.forEach((section) => {
+        setRoutingTime((x) => {
+          let temp = {...x};
+          if(temp["arrival"]){
+            temp["arrival"] += section.arrival.time
+            temp["departure"] += section.departure.time;
+          }else{
+            return { arrival: section.arrival.time, departure: section.departure.time }
+          }
+        });
+      })
       setRoutingEnabled(true);
     };
   };
