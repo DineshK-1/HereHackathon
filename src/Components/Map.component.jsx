@@ -168,9 +168,9 @@ export default function MapElement({ latitude, longitude }) {
   };
 
   function clearRoute() {
-    // if (vialocation.position === undefined) {
-    //   setRoutingEnabled(false);
-    // }
+    if (vialocation.position === undefined) {
+      setRoutingEnabled(false);
+    }
     map.current.removeObject(routingGroup.current);
   }
 

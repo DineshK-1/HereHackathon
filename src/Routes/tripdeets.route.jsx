@@ -69,7 +69,6 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
         <span className="material-symbols-outlined text-blue-700 items-center">
           arrow_downward
         </span>
-        {console.log(vialocation)}
         {vialocation && vialocation.position?.lat !== undefined && (
           <>
             <div className="inline-block">
@@ -92,11 +91,10 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
           <p className="text-blue-800">{tmetric}</p>
         </div>
         <div className="km flex flex-col items-center justify-center text-center bg-white p-3 rounded-full border-4 border-green-500 m-auto leading-3 drop-shadow-2xl">
-          <h2>160</h2>
+          <h2>-</h2>
           <p className="text-blue-800">INR</p>
         </div>
       </div>
-      {console.log(waypointsearch)}
       {vialocation && vialocation.title === "" && (
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl drop-shadow-2xl" onClick={() => setAddwaypoint(!addwaypoint)}>
           + Add a via point
@@ -133,8 +131,6 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
           </div>
         </>)}
 
-      {console.log(showToSuggestions)}
-
       <div className="sidebar bg-white text-black rounded-xl p-4 select-none cursor-pointer max-w-[400px]" onClick={() => setDroproute(!droproute)}>
         <div>
           <div className="flex justify-center">
@@ -157,9 +153,16 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
                           <span className="material-symbols-outlined font-bold text-2xl">turn_left</span>
                         ) : tempAction?.direction === "right" ? (
                           <span className="material-symbols-outlined">turn_right</span>
+                        ) : tempAction?.direction === "depart" ? (
+                          <span className="material-symbols-outlined">trip_origin</span>
+                        ) : tempAction?.action === "continue" ? (
+                          <span className="material-symbols-outlined">straight</span>
+                        ) : tempAction?.action === "enterHighway" ? (
+                          <span className="material-symbols-outlined">merge_type</span>
                         ) : (
-                          <span className="material-symbols-outlined">u_turn_right</span>
+                          <span className="material-symbols-outlined">location_on</span>
                         )}
+
                       </div>
                       <div className="flex w-full justify-between flex-col">
                         <div className="instructions flex justify-center text-md gap-1">
