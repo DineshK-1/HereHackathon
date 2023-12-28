@@ -5,7 +5,7 @@ export default function Footer() {
     <div className="flex flex-col main-wrapper w-full">
       <Outlet />
 
-      <div className="flex fixed bottom-0 w-full justify-center footer">
+      <div className="flex fixed bottom-0 w-full justify-center footer h-20">
         <nav className="flex justify-between my-6 w-full max-w-3xl items-center px-5">
           <NavLink
             to="/"
