@@ -284,7 +284,7 @@ export default function MapNew() {
             // map.current.removeObject(policeIncidentsGroup.current);
             policeIncidentsGroup.current = new H.map.Group();
             var policeIcon = new H.map.Icon(PoliceEmergency);
-            var ambulance = new H.map.Icon(AmbualnceIcon);
+            var ambulance = new H.map.Icon(EmergencyIcon);
             incidents.emergencies.forEach((inci) => {
                 if (inci.scene_type === "success") return;
                 if (inci.type === "police") {
