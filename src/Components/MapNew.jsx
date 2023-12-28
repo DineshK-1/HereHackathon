@@ -17,7 +17,7 @@ export default function MapNew() {
     const map = useRef(null);
     const platform = useRef(null);
 
-    const apikey = "XFPTW9372jRU8QoSFlXDbpAgL8JYciNBQU5M";
+    const apikey = "QjMeIb-XFPTW9372jRU8QoSFlXDbpAgL8JYciNBQU5M";
 
     const router = platform.current?.getRoutingService(null, 8);
     var destination = { lat: latitude, lng: longitude };
@@ -219,7 +219,7 @@ export default function MapNew() {
             'transportMode': 'car',
             'origin': `${inci.lat},${inci.lng}`,
             'destination': `${cops.lat},${cops.lng}`,
-            'return': 'polyline',
+            'return': 'polyline,summary',
         };
 
         destination = { lat: cops.lat, lng: cops.lng }
@@ -239,7 +239,7 @@ export default function MapNew() {
                 'transportMode': 'car',
                 'origin': `${selectedIncident.lat},${selectedIncident.lng}`,
                 'destination': `${selectedVehicle.lat},${selectedVehicle.lng}`,
-                'return': 'polyline',
+                'return': 'polyline,summary',
             };
 
             destination = { lat: selectedVehicle.lat, lng: selectedVehicle.lng }
@@ -307,8 +307,47 @@ export default function MapNew() {
         })
     }
 
+    function formatDistance(distanceInMeters) {
+        if (distanceInMeters >= 1000) {
+            const distanceInKilometers = (distanceInMeters / 1000).toFixed(2);
+            return `${distanceInKilometers} km`;
+        } else {
+            return `${distanceInMeters} m`;
+        }
+    }
+
+    function formatTime(timeInSeconds) {
+        if (timeInSeconds >= 3600) {
+            const timeInHours = (timeInSeconds / 3600).toFixed(2);
+            return `${timeInHours} hr`;
+        } else {
+            const timeInMinutes = (timeInSeconds / 60).toFixed(2);
+            return `${timeInMinutes} min`;
+        }
+    }
+
     return (
         <>
+            {
+                routingEnabled &&
+                routingResults?.routes &&
+                <div className="z-30 fixed flex bg-white p-2 gap-4 top-5 left-5 rounded-xl flex-col text-black">
+                    Summary
+                    <div className="flex flex-col gap-3">
+
+                        <>
+                            <div className="flex">
+                                Duration: {formatTime(routingResults?.routes[0]?.sections[0]?.summary?.duration)}
+                            </div>
+                            <div className="flex">
+                                Distance: {formatDistance(routingResults?.routes[0]?.sections[0]?.summary.length)}
+                            </div>
+                        </>
+
+                    </div>
+
+                </div>
+            }
             <div className="z-30 flex flex-col fixed gap-4 text-center right-0 h-screen overflow-y-auto text-black bg-white p-2">
                 Incidents
                 <div className="flex flex-col gap-2">
@@ -390,13 +429,13 @@ export default function MapNew() {
                                 <div key={idx} className={"flex flex-col p-1 rounded-lg select-none text-sm " + (inci.scene_type === "success" ? " bg-green-500" : (selectedIncident?.id === inci.id ? "bg-blue-600" : "bg-red-400"))}>
                                     <div className="flex">
                                         {
-                                            inci.type === "police" ? 
-                                            <span className={`material-symbols-outlined text-red-500`}>
-                                            local_police
-                                        </span>:
-                                        <span className={`material-symbols-outlined`}>
-                                        ambulance
-                                    </span>
+                                            inci.type === "police" ?
+                                                <span className={`material-symbols-outlined text-red-500`}>
+                                                    local_police
+                                                </span> :
+                                                <span className={`material-symbols-outlined`}>
+                                                    ambulance
+                                                </span>
                                         }
                                     </div>
                                     <div className="flex justify-between p-1 rounded-lg items-center">
@@ -405,7 +444,7 @@ export default function MapNew() {
                                             <span className="material-symbols-outlined ">keyboard_arrow_down</span>
                                         </div>
                                     </div>
-                                    
+
                                     {
                                         inci.scene_type === "success" ? "" :
                                             <>
