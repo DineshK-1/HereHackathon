@@ -145,36 +145,38 @@ export default function Tripdeets({ routingResults, fromLocation, searchArea, to
             <div className="flex flex-col gap-4 pt-4 text-black overflow-y-scroll" style={{ height: "400px " }}>
               {
                 routingResults &&
-                routingResults.routes[0].sections[0].turnByTurnActions.map((tempAction, i) => {
-                  return (
-                    <div key={i} className="flex gap-8">
-                      <div className="flex justify-center items-center">
-                        {tempAction?.direction === "left" ? (
-                          <span className="material-symbols-outlined font-bold text-2xl">turn_left</span>
-                        ) : tempAction?.direction === "right" ? (
-                          <span className="material-symbols-outlined">turn_right</span>
-                        ) : tempAction?.direction === "depart" ? (
-                          <span className="material-symbols-outlined">trip_origin</span>
-                        ) : tempAction?.action === "continue" ? (
-                          <span className="material-symbols-outlined">straight</span>
-                        ) : tempAction?.action === "enterHighway" ? (
-                          <span className="material-symbols-outlined">merge_type</span>
-                        ) : (
-                          <span className="material-symbols-outlined">location_on</span>
-                        )}
-
-                      </div>
-                      <div className="flex w-full justify-between flex-col">
-                        <div className="instructions flex justify-center text-md gap-1">
-                          <p className="font-bold">{tempAction?.action}</p>
-                          <p className="overflow-hidden whitespace-nowrap">{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
-                          <p className="overflow-hidden whitespace-nowrap"> {tempAction.nextRoad && tempAction?.nextRoad?.name && tempAction?.nextRoad?.name[0]?.value}</p>
+                routingResults.routes[0].sections.map((section) => {
+                  return section.turnByTurnActions.map((tempAction, i) => {
+                    return (
+                      <div key={i} className="flex gap-8">
+                        <div className="flex justify-center items-center">
+                          {tempAction?.direction === "left" ? (
+                            <span className="material-symbols-outlined font-bold text-2xl">turn_left</span>
+                          ) : tempAction?.direction === "right" ? (
+                            <span className="material-symbols-outlined">turn_right</span>
+                          ) : tempAction?.direction === "depart" ? (
+                            <span className="material-symbols-outlined">trip_origin</span>
+                          ) : tempAction?.action === "continue" ? (
+                            <span className="material-symbols-outlined">straight</span>
+                          ) : tempAction?.action === "enterHighway" ? (
+                            <span className="material-symbols-outlined">merge_type</span>
+                          ) : (
+                            <span className="material-symbols-outlined">location_on</span>
+                          )}
+  
                         </div>
-                        <span className="text-xs">{tempAction.currentRoad && tempAction?.currentRoad?.name && tempAction?.currentRoad?.name[0]?.value}</span>
-                        <hr />
+                        <div className="flex w-full justify-between flex-col">
+                          <div className="instructions flex justify-center text-md gap-1">
+                            <p className="font-bold">{tempAction?.action}</p>
+                            <p className="overflow-hidden whitespace-nowrap">{tempAction?.direction} {tempAction?.direction && ('onto')}</p>
+                            <p className="overflow-hidden whitespace-nowrap"> {tempAction.nextRoad && tempAction?.nextRoad?.name && tempAction?.nextRoad?.name[0]?.value}</p>
+                          </div>
+                          <span className="text-xs">{tempAction.currentRoad && tempAction?.currentRoad?.name && tempAction?.currentRoad?.name[0]?.value}</span>
+                          <hr />
+                        </div>
                       </div>
-                    </div>
-                  )
+                    )
+                  })
                 })
               }
             </div>

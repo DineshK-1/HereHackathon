@@ -308,7 +308,7 @@ export default function MapNew() {
 
     return (
         <>
-            <div className="z-30 flex flex-col fixed gap-4 text-center right-0 h-full text-black bg-white p-2">
+            <div className="z-30 flex flex-col fixed gap-4 text-center right-0 h-screen overflow-y-auto text-black bg-white p-2">
                 Incidents
                 <div className="flex flex-col gap-2">
                     {
